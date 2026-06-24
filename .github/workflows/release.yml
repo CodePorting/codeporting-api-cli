@@ -11,16 +11,13 @@ jobs:
         include:
           - os: ubuntu-latest
             rid: linux-x64
-            artifact: codeporting-api-cli-linux-x64
+            ext: ''
           - os: windows-latest
             rid: win-x64
-            artifact: codeporting-api-cli-win-x64.exe
+            ext: '.exe'
           - os: macos-latest
             rid: osx-arm64
-            artifact: codeporting-api-cli-osx-arm64
-          - os: macos-13
-            rid: osx-x64
-            artifact: codeporting-api-cli-osx-x64
+            ext: ''
 
     runs-on: ${{ matrix.os }}
 
@@ -41,6 +38,10 @@ jobs:
         shell: bash
         run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
 
+      - name: Set artifact name
+        shell: bash
+        run: echo "ARTIFACT_NAME=codeporting-api-cli-${{ matrix.rid }}${{ matrix.ext }}" >> $GITHUB_ENV
+
       - name: Publish AOT
         run: >
           dotnet publish src/CodePorting.Api.Cli
@@ -49,12 +50,18 @@ jobs:
           --self-contained true
           -p:PublishSingleFile=true
           -p:Version=${{ env.VERSION }}
+          -p:DebugType=none
           -o ./artifacts
+
+      - name: Rename artifact
+        shell: bash
+        run: |
+          mv "./artifacts/codeporting-api-cli${{ matrix.ext }}" "./artifacts/${{ env.ARTIFACT_NAME }}"
 
       - name: Upload to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: ./artifacts/codeporting-api-cli*
+          files: ./artifacts/${{ env.ARTIFACT_NAME }}
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
