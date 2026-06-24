@@ -1,0 +1,60 @@
+﻿name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+jobs:
+  publish:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            rid: linux-x64
+            artifact: codeporting-api-cli-linux-x64
+          - os: windows-latest
+            rid: win-x64
+            artifact: codeporting-api-cli-win-x64.exe
+          - os: macos-latest
+            rid: osx-arm64
+            artifact: codeporting-api-cli-osx-arm64
+          - os: macos-13
+            rid: osx-x64
+            artifact: codeporting-api-cli-osx-x64
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Install AOT prerequisites (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang zlib1g-dev
+
+      - name: Extract version from tag
+        shell: bash
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+
+      - name: Publish AOT
+        run: >
+          dotnet publish src/CodePorting.Api.Cli
+          -c Release
+          -r ${{ matrix.rid }}
+          --self-contained true
+          -p:PublishSingleFile=true
+          -p:Version=${{ env.VERSION }}
+          -o ./artifacts
+
+      - name: Upload to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ./artifacts/codeporting-api-cli*
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
