@@ -7,8 +7,9 @@ namespace CodePorting.Api.Cli.Services;
 
 public class ApiUploader
 {
-	private readonly HttpClient _httpClient;
+	private static readonly HttpClient _httpClient = new();
 	private readonly string _apiBaseUrl;
+	private readonly string _apiToken;
 
 	public const string ApiUrlEnvironmentVariable = "CODEPORTING_API_URL";
 	public const string ApiTokenEnvironmentVariable = "CODEPORTING_API_TOKEN";
@@ -20,14 +21,11 @@ public class ApiUploader
 	{
 		_apiBaseUrl = Environment.GetEnvironmentVariable(ApiUrlEnvironmentVariable) ?? DefaultApiBaseUrl;
 		
-		var apiToken = Environment.GetEnvironmentVariable(ApiTokenEnvironmentVariable);
-		if (string.IsNullOrEmpty(apiToken))
+		_apiToken = Environment.GetEnvironmentVariable(ApiTokenEnvironmentVariable) ?? "";
+		if (string.IsNullOrEmpty(_apiToken))
 		{
 			throw new CliException($"API access token is not set. Please set {ApiTokenEnvironmentVariable} environment variable.");
 		}
-
-		_httpClient = new HttpClient();
-		_httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiToken);
 	}
 
 	public async Task<string> UploadArchive(Guid projectUid, string archivePath, CancellationToken cancellationToken)
@@ -35,19 +33,25 @@ public class ApiUploader
 		var uploadUrl = BuildUploadUrl(projectUid);
 		using var content = CreateMultipartContent(archivePath);
 
+		using var request = new HttpRequestMessage(HttpMethod.Post, uploadUrl);
+		request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _apiToken);
+		request.Content = content;
+
 		HttpResponseMessage response;
 		try
 		{
-			response = await _httpClient.PostAsync(uploadUrl, content, cancellationToken);
+			response = await _httpClient.SendAsync(request, cancellationToken);
 		}
-		catch (HttpRequestException ex)
+		catch (HttpRequestException)
 		{
 			throw new CliException("Network error. Check your connection.");
 		}
 
-		await EnsureSuccessAsync(response, cancellationToken);
-
-		return await response.Content.ReadAsStringAsync(cancellationToken);
+		using (response)
+		{
+			await EnsureSuccessAsync(response, cancellationToken);
+			return await response.Content.ReadAsStringAsync(cancellationToken);
+		}
 	}
 
 	private string BuildUploadUrl(Guid projectUid)

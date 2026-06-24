@@ -58,7 +58,7 @@ public static class UploadCommand
 			Console.Error.WriteLine(ex.Message);
 			Environment.Exit(ex.ExitCode);
 		}
-		catch (Exception ex)
+		catch (Exception)
 		{
 			Console.Error.WriteLine($"Upload failed: an unexpected error occurred");
 			Environment.Exit(1);
@@ -118,9 +118,9 @@ public static class UploadCommand
 	}
 
 	private static async Task PerformUpload(Guid projectUid, UploadContext context, CancellationToken cancellationToken)
-  {
+	{
 		var files = ScanFiles(context.TargetPath);
-		if (!files.Any())
+		if (files.Count == 0)
 		{
 			return;
 		}
@@ -137,14 +137,14 @@ public static class UploadCommand
 		}
 	}
 
-	private static IEnumerable<string> ScanFiles(string targetPath)
+	private static IReadOnlyList<string> ScanFiles(string targetPath)
 	{
 		var scanner = new FileScanner();
-		var files = scanner.Scan(targetPath);
+		var files = scanner.Scan(targetPath).ToList();
 
-		if (files.Any())
+		if (files.Count > 0)
 		{
-			Console.WriteLine($"Found {files.Count()} files to upload");
+			Console.WriteLine($"Found {files.Count} files to upload");
 		}
 		else
 		{

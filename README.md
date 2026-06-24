@@ -1,6 +1,6 @@
 # codeporting-api-cli
 
-CLI client for **CodePorting AI API**. Companion tool for MCP integration — upload local project files to CodePorting storage.
+CLI client for **CodePorting AI API**. Companion tool for MCP integration â€” upload local project files to CodePorting storage.
 
 ## Installation
 
@@ -36,5 +36,17 @@ Set the `CODEPORTING_API_TOKEN` environment variable:
 ```bash
 codeporting-api-cli upload <project-uid> <local-path> [--root <root-dir>]
 ```
+
+### Parameters
+
+- `<project-uid>` (Required): The unique identifier (GUID) of your project in CodePorting workspace.
+- `<local-path>` (Required): Path to the specific file or directory on your local machine that you want to upload.
+- `--root <root-dir>` (Optional): Sets the project root directory. This is used to preserve the correct relative folder structure for uploaded files in the CodePorting workspace.
+  - *If not specified:* Defaults to the directory of `<local-path>` (if it's a file) or `<local-path>` itself (if it's a directory).
+  - *Example:* If your project is in `/projects/my-app` and you want to upload `/projects/my-app/src/utils/Helper.cs` while preserving its nested structure, run:
+    ```bash
+    codeporting-api-cli upload <project-uid> /projects/my-app/src/utils/Helper.cs --root /projects/my-app
+    ```
+    This ensures the file is placed inside `src/utils/` in your CodePorting project, rather than at the root.
 
 

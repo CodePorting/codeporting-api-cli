@@ -8,13 +8,28 @@ public class Archiver
 	{
 		var tempFile = Path.Combine(Path.GetTempPath(), $"project_{Guid.NewGuid()}.zip");
 
-		using (var archive = ZipFile.Open(tempFile, ZipArchiveMode.Create))
+		try
 		{
+			using var archive = ZipFile.Open(tempFile, ZipArchiveMode.Create);
 			foreach (var file in files)
 			{
-				var entryName = Path.GetRelativePath(rootPath, file);
+				var entryName = Path.GetRelativePath(rootPath, file).Replace('\\', '/');
 				archive.CreateEntryFromFile(file, entryName, CompressionLevel.Optimal);
 			}
+		}
+		catch (Exception)
+		{
+			if (File.Exists(tempFile))
+			{
+				try
+				{
+					File.Delete(tempFile);
+				}
+				catch
+				{
+				}
+			}
+			throw;
 		}
 
 		return tempFile;
