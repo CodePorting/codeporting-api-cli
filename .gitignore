@@ -376,10 +376,5 @@ FodyWeavers.xsd
 /assets/dotnet-sdk-3.1.415-linux-x64.tar.gz
 /assets/dotnet-sdk-3.1.404-linux-x64.tar.gz
 dist/
-src/CodePorting.WebApp.Ui.Products/Assets/js/*.LICENSE.txt
-src/CodePorting.WebApp/Assets/js/codeporting/*.LICENSE.txt
-src/CodePorting.WebApp.Ai/Assets/js/codeporting/*.LICENSE.txt
 .vscode
-/utils/otel-collector/otelcol-contrib.exe
-/utils/otelgen_windows_amd64/
-/implementation_plan.md
+/src/CodePorting.Api.Cli/Properties/launchSettings.json
