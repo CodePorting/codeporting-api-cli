@@ -38,10 +38,6 @@ jobs:
         shell: bash
         run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
 
-      - name: Set artifact name
-        shell: bash
-        run: echo "ARTIFACT_NAME=codeporting-api-cli-${{ matrix.rid }}${{ matrix.ext }}" >> $GITHUB_ENV
-
       - name: Publish AOT
         run: >
           dotnet publish src/CodePorting.Api.Cli
@@ -51,18 +47,20 @@ jobs:
           -p:PublishSingleFile=true
           -p:Version=${{ env.VERSION }}
           -p:DebugType=none
-          -o ./artifacts
+          -o ./artifacts/raw
 
-      - name: Rename artifact
+      - name: Package artifact
         shell: bash
         run: |
-          mv "./artifacts/codeporting-api-cli${{ matrix.ext }}" "./artifacts/${{ env.ARTIFACT_NAME }}"
+          ARCHIVE_NAME="codeporting-api-cli-${{ matrix.rid }}"
+          cd ./artifacts/raw
+          zip "../${ARCHIVE_NAME}.zip" "codeporting-api-cli${{ matrix.ext }}"
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: artifact-${{ matrix.rid }}
-          path: ./artifacts/${{ env.ARTIFACT_NAME }}
+          path: ./artifacts/codeporting-api-cli-${{ matrix.rid }}.zip
           retention-days: 7
 
   release:
@@ -81,7 +79,7 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: ./artifacts/*
+          files: ./artifacts/*.zip
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
