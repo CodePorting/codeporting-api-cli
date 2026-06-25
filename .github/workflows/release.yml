@@ -49,7 +49,17 @@ jobs:
           -p:DebugType=none
           -o ./artifacts/raw
 
-      - name: Package artifact
+      - name: Package artifact (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $archiveName = "codeporting-api-cli-${{ matrix.rid }}"
+          Compress-Archive `
+            -Path "./artifacts/raw/codeporting-api-cli${{ matrix.ext }}" `
+            -DestinationPath "./artifacts/$archiveName.zip"
+
+      - name: Package artifact (Unix)
+        if: runner.os != 'Windows'
         shell: bash
         run: |
           ARCHIVE_NAME="codeporting-api-cli-${{ matrix.rid }}"
