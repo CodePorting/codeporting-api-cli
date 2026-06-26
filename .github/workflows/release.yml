@@ -54,6 +54,7 @@ jobs:
           -r ${{ matrix.rid }}
           --self-contained true
           -p:PublishSingleFile=true
+          ${{ matrix.rid == 'linux-musl-x64' && '-p:StaticLinking=true' || '' }}
           -p:Version=${{ env.VERSION }}
           -p:DebugType=none
           -o ./artifacts/raw
