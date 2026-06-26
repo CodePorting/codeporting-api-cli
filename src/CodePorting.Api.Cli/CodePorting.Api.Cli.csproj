@@ -8,11 +8,14 @@
     <PublishAot>true</PublishAot>
     <InvariantGlobalization>true</InvariantGlobalization>
     
-    <RuntimeIdentifiers>win-x64;linux-x64;osx-x64;osx-arm64</RuntimeIdentifiers>
+    <RuntimeIdentifiers>win-x64;linux-x64;linux-musl-x64;osx-x64;osx-arm64</RuntimeIdentifiers>
     <AssemblyName>codeporting-api-cli</AssemblyName>
     
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(RuntimeIdentifier)' == 'linux-musl-x64'">
+    <StaticLinking>true</StaticLinking>
+  </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="System.CommandLine" Version="2.0.9" />
