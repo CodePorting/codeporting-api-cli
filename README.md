@@ -34,19 +34,38 @@ Set the `CODEPORTING_API_TOKEN` environment variable:
 ## Usage
 
 ```bash
-codeporting-api-cli upload <project-uid> <local-path> [--root <root-dir>]
+codeporting-api-cli upload <project-uid> <path> [--root <root-dir>]
 ```
 
 ### Parameters
 
-- `<project-uid>` (Required): The unique identifier (GUID) of your project in CodePorting workspace.
-- `<local-path>` (Required): Path to the specific file or directory on your local machine that you want to upload.
+- `<project-uid>` (Required): The unique identifier (GUID) of your project in CodePorting workspace. Retrieve it from the `.projectinfo` file at the local project root.
+- `<path>` (Required): Path to the specific directory or file on your local machine. Both absolute and relative paths are supported.
 - `--root <root-dir>` (Optional): Sets the project root directory. This is used to preserve the correct relative folder structure for uploaded files in the CodePorting workspace.
-  - *If not specified:* Defaults to the directory of `<local-path>` (if it's a file) or `<local-path>` itself (if it's a directory).
-  - *Example:* If your project is in `/projects/my-app` and you want to upload `/projects/my-app/src/utils/Helper.cs` while preserving its nested structure, run:
-    ```bash
-    codeporting-api-cli upload <project-uid> /projects/my-app/src/utils/Helper.cs --root /projects/my-app
-    ```
-    This ensures the file is placed inside `src/utils/` in your CodePorting project, rather than at the root.
+  *If not specified:* Defaults to the directory of `<path>` (if it's a file) or `<path>` itself (if it's a directory).
 
+## Examples
 
+### Upload entire project
+```bash
+codeporting-api-cli upload <project-uid> "/home/user/projects/my-app"
+```
+All files under `/home/user/projects/my-app/` are uploaded with their folder structure preserved.
+
+### Upload all from current directory
+```bash
+codeporting-api-cli upload <project-uid> "."
+```
+All files from current directory are uploaded with their folder structure preserved.
+
+### Upload directory preserving its structure
+```bash
+codeporting-api-cli upload <project-uid> "src/utils/" --root "."
+```
+The folder structure is preserved (e.g., `src/utils/file.cs` -> `src/utils/file.cs` in CodePorting workspace).
+
+### Upload single file preserving its structure
+```bash
+codeporting-api-cli upload <project-uid> "src/utils/file.cs" --root "."
+```
+The folder structure is preserved (e.g., `src/utils/file.cs` -> `src/utils/file.cs` in CodePorting workspace).
