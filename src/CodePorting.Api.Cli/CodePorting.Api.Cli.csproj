@@ -8,7 +8,7 @@
     <PublishAot>true</PublishAot>
     <InvariantGlobalization>true</InvariantGlobalization>
     
-    <RuntimeIdentifiers>win-x64;linux-x64;linux-musl-x64;osx-x64;osx-arm64</RuntimeIdentifiers>
+    <RuntimeIdentifiers>win-x64;linux-x64;osx-x64;osx-arm64</RuntimeIdentifiers>
     <AssemblyName>codeporting-api-cli</AssemblyName>
     
   </PropertyGroup>

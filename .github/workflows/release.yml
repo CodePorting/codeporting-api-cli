@@ -9,11 +9,8 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: ubuntu-latest
+          - os: ubuntu-20.04
             rid: linux-x64
-            ext: ''
-          - os: ubuntu-latest
-            rid: linux-musl-x64
             ext: ''
           - os: windows-latest
             rid: win-x64
@@ -37,12 +34,6 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y clang zlib1g-dev
 
-      - name: Install musl tools (Linux musl)
-        if: matrix.rid == 'linux-musl-x64'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y musl-tools
-
       - name: Extract version from tag
         shell: bash
         run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
@@ -54,7 +45,6 @@ jobs:
           -r ${{ matrix.rid }}
           --self-contained true
           -p:PublishSingleFile=true
-          ${{ matrix.rid == 'linux-musl-x64' && '-p:StaticLinking=true' || '' }}
           -p:Version=${{ env.VERSION }}
           -p:DebugType=none
           -o ./artifacts/raw

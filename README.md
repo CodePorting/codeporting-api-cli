@@ -13,7 +13,6 @@ CLI client for **CodePorting AI API**. Companion tool for MCP integration — up
 ### macOS / Linux
 1. Download the archive for your platform from [Releases](https://github.com/CodePorting/codeporting-api-cli/releases/latest):
    - Linux x64: `codeporting-api-cli-linux-x64.zip`
-   - Linux musl x64: `codeporting-api-cli-linux-musl-x64.zip`
    - Apple Silicon: `codeporting-api-cli-osx-arm64.zip`
 2. Extract `codeporting-api-cli` to `~/.codeporting/` (or any directory in your PATH, e.g., `~/.local/bin/`)
 3. Make it executable: `chmod +x ~/.codeporting/codeporting-api-cli`
